@@ -34,14 +34,16 @@ body {
   gap: 28px;
 }
 
-.nav-links a {
+.nav-links button {
   color: #52525b;
   text-decoration: none;
   font-size: 14px;
   font-weight: 500;
+  background-color: transparent;
+  border: none;
 }
 
-.nav-links a:hover {
+.nav-links button:hover {
   color: #18181b;
 }
 
