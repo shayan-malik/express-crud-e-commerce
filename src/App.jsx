@@ -251,7 +251,7 @@ function App() {
                     <h3>{product.title}</h3>
                     <p className="description">{product.description}</p>
                     <div className="card-footer">
-                      <span className="price">Rs. {product.price}</span>
+                      <span className="price">${product.price}</span>
                       <div className="card-actions">
                         <button className="icon-btn" onClick={() => startEditing(product)} title="Edit">
                           Edit
@@ -288,7 +288,7 @@ function App() {
                 <span>Title</span>
                 <input
                   type="text"
-                  placeholder="e.g. Running Shoes"
+                  placeholder="e.g. Smart Watch"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   className={addErrors.title ? "input-error" : ""}
