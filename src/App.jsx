@@ -10,9 +10,12 @@ function App() {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+
+  // Add Product Modal
   const [showAddModal, setShowAddModal] = useState(false);
   const [addErrors, setAddErrors] = useState({});
 
+  // Edit Product
   const [editingId, setEditingId] = useState(null);
   const [editTitle, setEditTitle] = useState("");
   const [editPrice, setEditPrice] = useState("");
@@ -20,6 +23,11 @@ function App() {
   const [editImageUrl, setEditImageUrl] = useState("");
   const [editErrors, setEditErrors] = useState({});
 
+  // Delete Product Modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
+  // Get Products
   const getProducts = async () => {
     try {
       const response = await axios.get(`${API_URL}/products`);
@@ -33,7 +41,7 @@ function App() {
     getProducts();
   }, []);
 
-  // Client-side validation — turant check, server tak jaye bina
+  // Validation
   const validate = (titleVal, priceVal, descriptionVal) => {
     const errors = {};
 
@@ -56,14 +64,17 @@ function App() {
     return errors;
   };
 
+  // Add Product
   const handleAddProduct = async (e) => {
     e.preventDefault();
 
     const errors = validate(title, price, description);
+
     if (Object.keys(errors).length > 0) {
       setAddErrors(errors);
       return;
     }
+
     setAddErrors({});
 
     try {
@@ -73,6 +84,7 @@ function App() {
         description: description,
         imageUrl: imageUrl,
       });
+
       if (response.data.status === "success") {
         setTitle("");
         setPrice("");
@@ -82,17 +94,20 @@ function App() {
         getProducts();
       }
     } catch (error) {
-      // Agar backend se validation error aaye (safety net)
+      // Backend validation error
       if (error.response?.data?.errors) {
         setAddErrors(error.response.data.errors);
       }
+
       console.log("error", error);
     }
   };
 
+  // Delete Product
   const handleDeleteProduct = async (id) => {
     try {
       const response = await axios.delete(`${API_URL}/product/${id}`);
+
       if (response.data.status === "success") {
         getProducts();
       }
@@ -101,6 +116,7 @@ function App() {
     }
   };
 
+  // Start Editing
   const startEditing = (product) => {
     setEditingId(product.id);
     setEditTitle(product.title);
@@ -110,17 +126,25 @@ function App() {
     setEditErrors({});
   };
 
+  // Cancel Editing
   const cancelEditing = () => {
     setEditingId(null);
     setEditErrors({});
   };
 
+  // Update Product
   const handleUpdateProduct = async (id) => {
-    const errors = validate(editTitle, editPrice, editDescription);
+    const errors = validate(
+      editTitle,
+      editPrice,
+      editDescription
+    );
+
     if (Object.keys(errors).length > 0) {
       setEditErrors(errors);
       return;
     }
+
     setEditErrors({});
 
     try {
@@ -130,6 +154,7 @@ function App() {
         description: editDescription,
         imageUrl: editImageUrl,
       });
+
       if (response.data.status === "success") {
         setEditingId(null);
         getProducts();
@@ -138,10 +163,12 @@ function App() {
       if (error.response?.data?.errors) {
         setEditErrors(error.response.data.errors);
       }
+
       console.log("error", error);
     }
   };
 
+  // Close Add Modal
   const closeAddModal = () => {
     setShowAddModal(false);
     setAddErrors({});
@@ -149,55 +176,91 @@ function App() {
 
   return (
     <div className="app">
+
       {/* Navbar */}
       <nav className="navbar">
         <span className="logo">Products</span>
+
         <div className="nav-links">
           <button>Home</button>
           <button>About</button>
           <button>Contact</button>
-
         </div>
       </nav>
+
 
       {/* Toolbar */}
       <div className="toolbar">
         <h1>All Products</h1>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+
+        <button
+          className="btn btn-primary"
+          onClick={() => setShowAddModal(true)}
+        >
           + Add Product
         </button>
       </div>
 
+
       {/* Product Grid */}
       <div className="container">
+
         {products.length === 0 ? (
+
           <div className="empty-state">
             <p>No products found</p>
             <span>Click "+ Add Product" to get started</span>
           </div>
+
         ) : (
+
           <div className="product-grid">
+
             {products.map((product) => (
-              <div className="product-card" key={product.id}>
+
+              <div
+                className="product-card"
+                key={product.id}
+              >
+
+                {/* Edit Mode */}
                 {editingId === product.id ? (
+
                   <div className="edit-mode">
+
                     <input
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       placeholder="Title"
-                      className={editErrors.title ? "input-error" : ""}
+                      className={
+                        editErrors.title ? "input-error" : ""
+                      }
                     />
-                    {editErrors.title && <span className="error-text">{editErrors.title}</span>}
+
+                    {editErrors.title && (
+                      <span className="error-text">
+                        {editErrors.title}
+                      </span>
+                    )}
+
 
                     <input
                       type="number"
                       value={editPrice}
                       onChange={(e) => setEditPrice(e.target.value)}
                       placeholder="Price"
-                      className={editErrors.price ? "input-error" : ""}
+                      className={
+                        editErrors.price ? "input-error" : ""
+                      }
                     />
-                    {editErrors.price && <span className="error-text">{editErrors.price}</span>}
+
+                    {editErrors.price && (
+                      <span className="error-text">
+                        {editErrors.price}
+                      </span>
+                    )}
+
 
                     <input
                       type="text"
@@ -206,31 +269,56 @@ function App() {
                       placeholder="Image URL"
                     />
 
+
                     <textarea
                       value={editDescription}
-                      onChange={(e) => setEditDescription(e.target.value)}
+                      onChange={(e) =>
+                        setEditDescription(e.target.value)
+                      }
                       placeholder="Description"
-                      className={editErrors.description ? "input-error" : ""}
+                      className={
+                        editErrors.description
+                          ? "input-error"
+                          : ""
+                      }
                     />
+
                     {editErrors.description && (
-                      <span className="error-text">{editErrors.description}</span>
+                      <span className="error-text">
+                        {editErrors.description}
+                      </span>
                     )}
 
+
                     <div className="edit-actions">
+
                       <button
                         className="btn btn-primary btn-sm"
-                        onClick={() => handleUpdateProduct(product.id)}
+                        onClick={() =>
+                          handleUpdateProduct(product.id)
+                        }
                       >
                         Save
                       </button>
-                      <button className="btn btn-ghost btn-sm" onClick={cancelEditing}>
+
+                      <button
+                        className="btn btn-ghost btn-sm"
+                        onClick={cancelEditing}
+                      >
                         Cancel
                       </button>
+
                     </div>
+
                   </div>
+
                 ) : (
+
                   <>
+                    {/* Product Image */}
+
                     {product.imageUrl ? (
+
                       <img
                         src={product.imageUrl}
                         alt={product.title}
@@ -240,104 +328,328 @@ function App() {
                           e.target.nextSibling.style.display = "flex";
                         }}
                       />
+
                     ) : null}
+
+
+                    {/* Image Placeholder */}
+
                     <div
                       className="card-image-placeholder"
-                      style={{ display: product.imageUrl ? "none" : "flex" }}
+                      style={{
+                        display: product.imageUrl
+                          ? "none"
+                          : "flex"
+                      }}
                     >
                       {product.title.charAt(0).toUpperCase()}
                     </div>
-                    <span className="badge">In Stock</span>
+
+
+                    <span className="badge">
+                      In Stock
+                    </span>
+
+
                     <h3>{product.title}</h3>
-                    <p className="description">{product.description}</p>
+
+                    <p className="description">
+                      {product.description}
+                    </p>
+
+
+                    {/* Card Footer */}
+
                     <div className="card-footer">
-                      <span className="price">${product.price}</span>
+
+                      <span className="price">
+                        ${product.price}
+                      </span>
+
+
                       <div className="card-actions">
-                        <button className="icon-btn" onClick={() => startEditing(product)} title="Edit">
+
+                        {/* Edit Button */}
+
+                        <button
+                          className="icon-btn"
+                          onClick={() =>
+                            startEditing(product)
+                          }
+                          title="Edit"
+                        >
                           Edit
                         </button>
+
+
+                        {/* Delete Button */}
+
                         <button
                           className="icon-btn icon-btn-danger"
-                          onClick={() => handleDeleteProduct(product.id)}
+                          onClick={() => {
+                            setSelectedProduct(product);
+                            setShowDeleteModal(true);
+                          }}
                           title="Delete"
                         >
                           Delete
                         </button>
+
                       </div>
+
                     </div>
+
                   </>
+
                 )}
+
               </div>
+
             ))}
+
           </div>
+
         )}
+
       </div>
 
-      {/* Add Product Modal */}
-      {showAddModal && (
-        <div className="modal-overlay" onClick={closeAddModal}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+
+      {/* ========================= */}
+      {/* Delete Product Modal */}
+      {/* ========================= */}
+
+      {showDeleteModal && (
+
+        <div
+          className="modal-overlay"
+          onClick={() => setShowDeleteModal(false)}
+        >
+
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+
             <div className="modal-header">
-              <h2>Add New Product</h2>
-              <button className="modal-close" onClick={closeAddModal}>
+
+              <h2>Delete Product</h2>
+
+              <button
+                className="modal-close"
+                onClick={() =>
+                  setShowDeleteModal(false)
+                }
+              >
                 ×
               </button>
+
             </div>
-            <form onSubmit={handleAddProduct} className="modal-form" noValidate>
+
+
+            <p>
+              Are you sure you want to delete{" "}
+              <strong>
+                {selectedProduct?.title}
+              </strong>
+              ?
+            </p>
+
+
+            <div className="edit-actions">
+
+              {/* Cancel */}
+
+              <button
+                className="btn btn-ghost btn-sm"
+                onClick={() =>
+                  setShowDeleteModal(false)
+                }
+              >
+                Cancel
+              </button>
+
+
+              {/* Confirm Delete */}
+
+              <button
+                className="btn btn-sm icon-btn-danger"
+                onClick={() => {
+                  handleDeleteProduct(
+                    selectedProduct.id
+                  );
+
+                  setShowDeleteModal(false);
+                }}
+              >
+                Delete
+              </button>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      )}
+
+
+      {/* ========================= */}
+      {/* Add Product Modal */}
+      {/* ========================= */}
+
+      {showAddModal && (
+
+        <div
+          className="modal-overlay"
+          onClick={closeAddModal}
+        >
+
+          <div
+            className="modal"
+            onClick={(e) => e.stopPropagation()}
+          >
+
+            <div className="modal-header">
+
+              <h2>Add New Product</h2>
+
+              <button
+                className="modal-close"
+                onClick={closeAddModal}
+              >
+                ×
+              </button>
+
+            </div>
+
+
+            <form
+              onSubmit={handleAddProduct}
+              className="modal-form"
+              noValidate
+            >
+
+              {/* Title */}
+
               <label>
+
                 <span>Title</span>
+
                 <input
                   type="text"
                   placeholder="e.g. Smart Watch"
                   value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className={addErrors.title ? "input-error" : ""}
+                  onChange={(e) =>
+                    setTitle(e.target.value)
+                  }
+                  className={
+                    addErrors.title
+                      ? "input-error"
+                      : ""
+                  }
                 />
-                {addErrors.title && <span className="error-text">{addErrors.title}</span>}
+
+                {addErrors.title && (
+                  <span className="error-text">
+                    {addErrors.title}
+                  </span>
+                )}
+
               </label>
 
+
+              {/* Image URL */}
+
               <label>
+
                 <span>Image URL</span>
+
                 <input
                   type="text"
                   placeholder="https://example.com/image.jpg"
                   value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
+                  onChange={(e) =>
+                    setImageUrl(e.target.value)
+                  }
                 />
+
               </label>
 
+
+              {/* Price */}
+
               <label>
+
                 <span>Price (Rs.)</span>
+
                 <input
                   type="number"
                   placeholder="0"
                   value={price}
-                  onChange={(e) => setPrice(e.target.value)}
-                  className={addErrors.price ? "input-error" : ""}
+                  onChange={(e) =>
+                    setPrice(e.target.value)
+                  }
+                  className={
+                    addErrors.price
+                      ? "input-error"
+                      : ""
+                  }
                 />
-                {addErrors.price && <span className="error-text">{addErrors.price}</span>}
+
+                {addErrors.price && (
+                  <span className="error-text">
+                    {addErrors.price}
+                  </span>
+                )}
+
               </label>
 
+
+              {/* Description */}
+
               <label>
+
                 <span>Description</span>
+
                 <textarea
                   placeholder="Short description"
                   value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className={addErrors.description ? "input-error" : ""}
+                  onChange={(e) =>
+                    setDescription(e.target.value)
+                  }
+                  className={
+                    addErrors.description
+                      ? "input-error"
+                      : ""
+                  }
                 />
+
                 {addErrors.description && (
-                  <span className="error-text">{addErrors.description}</span>
+                  <span className="error-text">
+                    {addErrors.description}
+                  </span>
                 )}
+
               </label>
 
-              <button type="submit" className="btn btn-primary btn-full">
+
+              {/* Submit */}
+
+              <button
+                type="submit"
+                className="btn btn-primary btn-full"
+              >
                 Add Product
               </button>
+
             </form>
+
           </div>
+
         </div>
+
       )}
+
     </div>
   );
 }
