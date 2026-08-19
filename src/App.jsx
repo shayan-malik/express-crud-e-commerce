@@ -580,7 +580,7 @@ function App() {
 
               <label>
 
-                <span>Price (Rs.)</span>
+                <span>Price ($)</span>
 
                 <input
                   type="number"
