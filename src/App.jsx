@@ -2,7 +2,7 @@ import axios from 'axios';
 import './App.css';
 import { useState, useEffect } from "react";
 
-const API_URL = "https://express-ecommerce-crud-production.up.railway.app";
+const API_URL = "https://express-ecommerce-crud.vercel.app";
 
 function App() {
   const [products, setProducts] = useState([]);
